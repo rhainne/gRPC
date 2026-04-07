@@ -18,7 +18,8 @@ message PostId {
 service BlogService {
   rpc CreatePost(Post) returns (PostId) {}
   rpc ReadPost(PostId) returns (Post) {}
-  rpc UpdatePost(PostId) returns (google.protobuf.Empty) {}
+  rpc ReplacePost(Post) returns (Post) {}
+  rpc UpdatePost(Post) returns (Post) {}
   rpc DeletePost(PostId) returns (google.protobuf.Empty) {}
-  rpc ListPosts(google.protobuf.Empty) returns (stream Post) {}
+  rpc ReadPosts(google.protobuf.Empty) returns (stream Post) {}
 }

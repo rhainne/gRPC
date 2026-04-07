@@ -28,13 +28,39 @@ function readPost(client, id) {
   });
 }
 
+function readPosts(client) {
+  return new Promise((resolve, reject) => {
+    const call = client.ReadPosts({});
+    call.on('data', (response) => {
+      console.log("<readPosts> Response from server:", response);
+    });
+    call.on('error', (error) => {
+      reject(error);
+    });
+    call.on('end', () => {
+      resolve();
+    });
+  });
+}
+
 function updatePost(client, post) {
   return new Promise((resolve, reject) => {
     client.UpdatePost(post, (error, response) => {
       if (error)
         reject(error);
-      console.log("<updatePost> Response from server:", response);
-      resolve();
+
+      resolve(response);
+    });
+  });
+}
+
+function replacePost(client, post) {
+  return new Promise((resolve, reject) => {
+    client.ReplacePost(post, (error, response) => {
+      if (error)
+        reject(error);
+
+      resolve(response);
     });
   });
 }
@@ -63,14 +89,27 @@ async function main() {
       credentials
     );
 
-  const it = await createPost(client, {
-    author_id: 'adri',
-    title: 'Package Managers are Evil',
-    content: 'Just created'
-  });
+  // await readPost(client, '69d176c7c6f0be5b5fd092ac');
+  // const it = await createPost(client, {
+  //   author_id: 'adri',
+  //   title: 'Package Managers are Evil',
+  //   content: 'Just created'
+  // });
 
-  await readPost(client, it.id);
-  await readPost(client, '69d176c7c6f0be5b5fd092ac');
+  // const updatedPost = await updatePost(client, {
+  //   id: '69d17607c6f0be5b5fd092aa',
+  //   author_id: 'not adri',
+  //   content: 'Just updated'
+  // });
+
+  // const replacedPost = await replacePost(client, {
+  //   id: '69d17624c6f0be5b5fd092ab',
+  //   author_id: 'marmar',
+  //   content: 'Just replaced'
+  // });
+
+  readPosts(client);
+
 }
 
 main();

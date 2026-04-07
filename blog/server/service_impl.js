@@ -1,13 +1,10 @@
 const grpc = require('@grpc/grpc-js');
 
-const { MongoClient, ObjectId } = require('mongodb');
+const { ObjectId } = require('mongodb');
 
 
 exports.createPost = async (call, callback) => {
   try {
-    console.log("request", call.request);
-    console.log("request.post", call.request.post);
-
     const post = call.request;
     const result = await collection.insertOne(postToDocument(post));
     if (checkNotAcknowledged(result, callback))
@@ -38,18 +35,24 @@ exports.readPost = async (call, callback) => {
 exports.replacePost = async (call, callback) => {
   try {
     const post = call.request;
+
     const id = checkOID(post.id, callback);
-    if (!id) return;
+    if (!id)
+      return;
 
     const result = await collection
-      .replaceOne({ _id: id }, postToDocument(post));
+      .findOneAndReplace(
+        { _id: id },
+        postToDocument(post),
+        { returnDocument: 'after' }
+      );
 
     if (checkNotFound(result, callback))
       return;
 
     callback(null, documentToPost(result));
   } catch (err) {
-    internalError(err, callback);
+    internalError(`<replacePost> ${err}`, callback);
   }
 };
 
@@ -65,16 +68,33 @@ exports.updatePost = async (call, callback) => {
     if (post.content) updateDoc.content = post.content;
 
     const result = await collection
-      .updateOne({ _id: id }, { $set: updateDoc });
+      .findOneAndUpdate(
+        { _id: id },
+        { $set: updateDoc },
+        { returnDocument: 'after' }
+      );
 
-    if (checkNotFound(result, callback))
-      return;
+    if (checkNotFound(result, callback)) return;
 
     callback(null, documentToPost(result));
   } catch (err) {
-    internalError(err, callback);
+    internalError(`<updatePost> ${err}`, callback);
   }
 };
+
+exports.readPosts = async (call) => {
+  try {
+    const cursor = collection.find();
+    for await (const doc of cursor)
+      call.write(documentToPost(doc));
+
+    call.end();
+  } catch (err) {
+    internalError(`<readPosts> ${err}`, (error) => {
+      call.emit('error', error);
+    });
+  }
+}
 
 ////////////
 // Helpers //
@@ -128,7 +148,7 @@ function checkOID(id, callback) {
 }
 
 function checkNotFound(result, callback) {
-  if (!result || result.matchedCount === 0) {
+  if (!result) {
     callback({
       code: grpc.status.NOT_FOUND,
       message: 'Blog post not found',
