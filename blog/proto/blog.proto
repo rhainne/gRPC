@@ -20,6 +20,6 @@ service BlogService {
   rpc ReadPost(PostId) returns (Post) {}
   rpc ReplacePost(Post) returns (Post) {}
   rpc UpdatePost(Post) returns (Post) {}
-  rpc DeletePost(PostId) returns (google.protobuf.Empty) {}
   rpc ReadPosts(google.protobuf.Empty) returns (stream Post) {}
+  rpc DeletePost(PostId) returns (google.protobuf.Empty) {}
 }

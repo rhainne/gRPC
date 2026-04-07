@@ -65,6 +65,17 @@ function replacePost(client, post) {
   });
 }
 
+function deletePost(client, id) {
+  return new Promise((resolve, reject) => {
+    client.DeletePost({ id }, (error, response) => {
+      if (error)
+        reject(error);
+
+      resolve(response);
+    });
+  });
+}
+
 async function main() {
   const packageDefinition = protoLoader.loadSync(path.join(__dirname, '../proto/blog.proto'), {
     keepCase: true,
@@ -108,6 +119,7 @@ async function main() {
   //   content: 'Just replaced'
   // });
 
+  deletePost(client, '69d17607c6f0be5b5fd092aa');
   readPosts(client);
 
 }

@@ -82,6 +82,27 @@ exports.updatePost = async (call, callback) => {
   }
 };
 
+exports.deletePost = async (call, callback) => {
+  try {
+    const id = checkOID(call.request.id, callback);
+    if (!id) return;
+
+    const result = await collection.deleteOne({ _id: id });
+    if (checkNotAcknowledged(result, callback)) return;
+
+    if (result.deletedCount === 0) {
+      callback({
+        code: grpc.status.NOT_FOUND,
+        message: 'Blog post not found',
+      });
+      return;
+    }
+    callback(null, {});
+  } catch (err) {
+    internalError(`<deletePost> ${err}`, callback);
+  }
+};
+
 exports.readPosts = async (call) => {
   try {
     const cursor = collection.find();
