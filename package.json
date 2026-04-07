@@ -1,0 +1,29 @@
+{
+  "name": "grpc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "greet:server": "node greet/server/index.js",
+    "greet:client": "node greet/client/index.js",
+    "calculator:server": "node calculator/server/index.js",
+    "calculator:client": "node calculator/client/index.js",
+    "blog:server": "node blog/server/index.js",
+    "blog:client": "node blog/client/index.js",
+    "blog:db": "cd blog && docker-compose up && cd ..",
+    "ssl:gen": "cd ssl && powershell -ExecutionPolicy unrestricted ../scripts/ssl.ps1 && cd .."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.3",
+    "@grpc/proto-loader": "^0.8.0",
+    "google-protobuf": "^4.0.2",
+    "mongodb": "^7.1.1"
+  },
+  "devDependencies": {
+    "protolint": "^0.56.4"
+  }
+}
